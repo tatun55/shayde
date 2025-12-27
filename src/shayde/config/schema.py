@@ -87,6 +87,17 @@ class RegressionConfig(BaseModel):
     update_snapshots: Literal["none", "missing", "all"] = "none"
 
 
+class TestConfig(BaseModel):
+    """E2E test configuration for Playwright."""
+
+    directory: str = "tests/e2e"
+    before: Optional[str] = None  # Command to run before tests (e.g., "php artisan migrate:fresh --seed")
+    config_file: Optional[str] = None  # Playwright config file path
+    timeout: int = 30000  # Test timeout in ms
+    retries: int = 0  # Number of retries on failure
+    workers: int = 1  # Number of parallel workers
+
+
 class ShaydeConfig(BaseModel):
     """Root configuration model for Shayde."""
 
@@ -105,6 +116,7 @@ class ShaydeConfig(BaseModel):
     )
     capture: CaptureConfig = Field(default_factory=CaptureConfig)
     regression: RegressionConfig = Field(default_factory=RegressionConfig)
+    test: TestConfig = Field(default_factory=TestConfig)
 
     @classmethod
     def get_default(cls) -> "ShaydeConfig":

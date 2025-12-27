@@ -89,6 +89,21 @@ shayde docker logs     # ログ表示
 shayde docker logs -f  # ログをフォロー
 ```
 
+### E2E テスト
+
+```bash
+shayde test init                      # テスト環境セットアップ
+shayde test run                       # テスト実行
+shayde test run --headed              # ブラウザ表示モードで実行
+shayde test run --debug               # デバッグモードで実行
+shayde test run tests/e2e/login.ts    # 特定ファイルのみ実行
+shayde test run --grep "ログイン"      # 特定テストのみ実行
+shayde test run --workers 4           # 並列実行
+shayde test run --update-snapshots    # スナップショット更新
+shayde test run --skip-before         # before コマンドをスキップ
+shayde test list                      # テストファイル一覧
+```
+
 ### 設定管理
 
 ```bash
@@ -150,6 +165,13 @@ capture:
   wait_until: networkidle   # load, domcontentloaded, networkidle
   wait_after: 0             # 追加待機時間(ms)
   full_page: false
+
+test:
+  directory: "tests/e2e"
+  before: "php artisan migrate:fresh --seed"  # テスト前に実行
+  timeout: 30000            # テストタイムアウト(ms)
+  workers: 1                # 並列ワーカー数
+  retries: 0                # リトライ回数
 ```
 
 ## アーキテクチャ

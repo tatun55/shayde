@@ -1,4 +1,4 @@
-"""Configuration loader for PlayCap."""
+"""Configuration loader for Shayde."""
 
 from __future__ import annotations
 
@@ -8,11 +8,11 @@ from typing import Any, Dict, Optional
 
 import yaml
 
-from playcap.config.schema import PlayCapConfig
+from shayde.config.schema import ShaydeConfig
 
 
-CONFIG_FILENAMES = [".playcap.yaml", ".playcap.yml", "playcap.yaml", "playcap.yml"]
-GLOBAL_CONFIG_DIR = Path.home() / ".config" / "playcap"
+CONFIG_FILENAMES = [".shayde.yaml", ".shayde.yml", "shayde.yaml", "shayde.yml"]
+GLOBAL_CONFIG_DIR = Path.home() / ".config" / "shayde"
 GLOBAL_CONFIG_FILE = GLOBAL_CONFIG_DIR / "config.yaml"
 
 
@@ -78,13 +78,13 @@ def detect_vite_port() -> Optional[int]:
 def load_config(
     config_file: Optional[Path] = None,
     project_dir: Optional[Path] = None,
-) -> PlayCapConfig:
+) -> ShaydeConfig:
     """Load and merge configuration from all sources.
 
     Priority (later overrides earlier):
     1. Built-in defaults
-    2. Global config (~/.config/playcap/config.yaml)
-    3. Project config (.playcap.yaml)
+    2. Global config (~/.config/shayde/config.yaml)
+    3. Project config (.shayde.yaml)
     4. Explicit config file (if provided)
     """
     # Start with defaults
@@ -104,7 +104,7 @@ def load_config(
         config_data = _deep_merge(config_data, project_data)
 
     # Create config object
-    config = PlayCapConfig(**config_data) if config_data else PlayCapConfig()
+    config = ShaydeConfig(**config_data) if config_data else ShaydeConfig()
 
     # Auto-detect APP_URL if not set
     if config.app.base_url is None:
@@ -134,7 +134,7 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
     return result
 
 
-def save_config(config: PlayCapConfig, path: Path) -> None:
+def save_config(config: ShaydeConfig, path: Path) -> None:
     """Save configuration to YAML file."""
     path.parent.mkdir(parents=True, exist_ok=True)
 

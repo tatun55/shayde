@@ -1,1 +1,1 @@
-"""Tests for PlayCap."""
+"""Tests for Shayde."""

@@ -1,4 +1,4 @@
-"""Configuration schema for PlayCap using Pydantic."""
+"""Configuration schema for Shayde using Pydantic."""
 
 from __future__ import annotations
 
@@ -49,12 +49,12 @@ class DockerConfig(BaseModel):
     """Docker container configuration."""
 
     playwright_version: str = "1.48.0"
-    container_name: str = "playcap-playwright"
+    container_name: str = "shayde-playwright"
     ws_port: int = 3000
     auto_start: bool = True
     auto_stop: bool = False
-    use_custom_image: bool = False  # Set True after running: playcap docker build
-    image_name: str = "playcap-playwright"  # Custom image name
+    use_custom_image: bool = False  # Set True after running: shayde docker build
+    image_name: str = "shayde-playwright"  # Custom image name
 
 
 class OutputConfig(BaseModel):
@@ -87,8 +87,8 @@ class RegressionConfig(BaseModel):
     update_snapshots: Literal["none", "missing", "all"] = "none"
 
 
-class PlayCapConfig(BaseModel):
-    """Root configuration model for PlayCap."""
+class ShaydeConfig(BaseModel):
+    """Root configuration model for Shayde."""
 
     version: int = 1
     app: AppConfig = Field(default_factory=AppConfig)
@@ -107,6 +107,6 @@ class PlayCapConfig(BaseModel):
     regression: RegressionConfig = Field(default_factory=RegressionConfig)
 
     @classmethod
-    def get_default(cls) -> "PlayCapConfig":
+    def get_default(cls) -> "ShaydeConfig":
         """Return default configuration."""
         return cls()

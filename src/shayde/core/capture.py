@@ -11,7 +11,7 @@ from urllib.parse import urljoin, urlparse
 
 if TYPE_CHECKING:
     from playwright.async_api import Page
-    from playcap.config.schema import PlayCapConfig, ViewportConfig
+    from shayde.config.schema import ShaydeConfig, ViewportConfig
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,7 @@ async def capture_screenshot(
 class CaptureSession:
     """Manages a capture session with browser and proxy."""
 
-    def __init__(self, config: "PlayCapConfig", platform: Optional[str] = None):
+    def __init__(self, config: "ShaydeConfig", platform: Optional[str] = None):
         self.config = config
         self._platform = platform
         self._browser_manager = None
@@ -116,7 +116,7 @@ class CaptureSession:
 
     def get_platform_css(self) -> str:
         """Get CSS for current platform's fonts."""
-        from playcap.docker.manager import PLATFORM_CSS
+        from shayde.docker.manager import PLATFORM_CSS
         platform = self._platform or self.config.fonts.platform
         return PLATFORM_CSS.get(platform, PLATFORM_CSS["neutral"])
 
@@ -127,10 +127,10 @@ class CaptureSession:
 
     async def setup(self) -> None:
         """Set up capture session (Docker, proxy, browser)."""
-        from playcap.docker.manager import DockerManager
-        from playcap.proxy.manager import ProxyManager
-        from playcap.core.browser import BrowserManager
-        from playcap.core.routes import create_route_handler
+        from shayde.docker.manager import DockerManager
+        from shayde.proxy.manager import ProxyManager
+        from shayde.core.browser import BrowserManager
+        from shayde.core.routes import create_route_handler
 
         # Start Docker container
         self._docker_manager = DockerManager(self.config)
@@ -181,8 +181,8 @@ class CaptureSession:
         Returns:
             True if login was successful
         """
-        from playcap.core.auth import login_with_form
-        from playcap.core.routes import create_route_handler
+        from shayde.core.auth import login_with_form
+        from shayde.core.routes import create_route_handler
 
         # Resolve login URL
         if login_url is None:
@@ -237,7 +237,7 @@ class CaptureSession:
         Returns:
             Path to saved screenshot
         """
-        from playcap.core.routes import create_route_handler
+        from shayde.core.routes import create_route_handler
 
         # Resolve URL
         url = resolve_url(url_or_path, self.config.app.base_url)

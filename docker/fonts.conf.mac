@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<!-- Mac-style font configuration for PlayCap -->
+<!-- Mac-style font configuration for Shayde -->
 <fontconfig>
   <!-- Japanese sans-serif: Source Han Sans (similar to Hiragino) -->
   <match target="pattern">

@@ -8,10 +8,10 @@ import signal
 import sys
 from typing import TYPE_CHECKING
 
-from playcap.proxy.server import DevServerProxy
+from shayde.proxy.server import DevServerProxy
 
 if TYPE_CHECKING:
-    from playcap.config.schema import PlayCapConfig
+    from shayde.config.schema import ShaydeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ProxyManager:
     """Manages the proxy server lifecycle."""
 
-    def __init__(self, config: PlayCapConfig):
+    def __init__(self, config: ShaydeConfig):
         self.config = config
         self.proxy: DevServerProxy | None = None
         self._task: asyncio.Task | None = None
@@ -58,7 +58,7 @@ class ProxyManager:
         await self.stop()
 
 
-async def run_proxy_standalone(config: PlayCapConfig) -> None:
+async def run_proxy_standalone(config: ShaydeConfig) -> None:
     """Run proxy as standalone server (for debugging)."""
     manager = ProxyManager(config)
 

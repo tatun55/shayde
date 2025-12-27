@@ -9,7 +9,7 @@ from typing import List, Literal, Optional
 import typer
 from rich.console import Console
 
-from playcap.config.loader import load_config
+from shayde.config.loader import load_config
 
 console = Console()
 app = typer.Typer(no_args_is_help=True)
@@ -72,8 +72,8 @@ async def _capture_page(
     wait_for: Optional[str],
 ):
     """Async implementation of capture_page."""
-    from playcap.config.schema import ViewportConfig
-    from playcap.core.capture import CaptureSession
+    from shayde.config.schema import ViewportConfig
+    from shayde.core.capture import CaptureSession
 
     config = load_config()
 
@@ -138,7 +138,7 @@ async def _capture_batch(
 ):
     """Async implementation of capture_batch."""
     import asyncio
-    from playcap.core.capture import CaptureSession
+    from shayde.core.capture import CaptureSession
 
     config = load_config()
 
@@ -191,7 +191,7 @@ async def _capture_responsive(
     viewports: Optional[str],
 ):
     """Async implementation of capture_responsive."""
-    from playcap.core.capture import CaptureSession
+    from shayde.core.capture import CaptureSession
 
     config = load_config()
 
@@ -264,7 +264,7 @@ async def _capture_auth(
     output_dir: Optional[Path],
 ):
     """Async implementation of capture_auth."""
-    from playcap.core.capture import CaptureSession
+    from shayde.core.capture import CaptureSession
 
     config = load_config()
 
@@ -338,7 +338,7 @@ async def _capture_platforms(
     platforms: Optional[str],
 ):
     """Async implementation of capture_platforms."""
-    from playcap.core.capture import CaptureSession
+    from shayde.core.capture import CaptureSession
 
     config = load_config()
 

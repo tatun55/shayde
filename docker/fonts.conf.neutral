@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<!-- Neutral font configuration for PlayCap (default) -->
+<!-- Neutral font configuration for Shayde (default) -->
 <fontconfig>
   <!-- Japanese: Noto Sans CJK JP (neutral, cross-platform) -->
   <match target="pattern">

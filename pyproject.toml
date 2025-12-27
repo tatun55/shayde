@@ -3,16 +3,16 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "playcap"
+name = "shayde"
 version = "0.1.0"
-description = "Docker Playwright screenshot capture and visual regression testing CLI"
+description = "Docker Playwright E2E testing and screenshot capture CLI"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
 authors = [
-    { name = "PlayCap Team" }
+    { name = "Shayde Team" }
 ]
-keywords = ["playwright", "screenshot", "visual-regression", "testing", "docker"]
+keywords = ["playwright", "e2e", "testing", "screenshot", "visual-regression", "docker"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -50,17 +50,17 @@ dev = [
 ]
 
 [project.scripts]
-playcap = "playcap.cli.main:app"
+shayde = "shayde.cli.main:app"
 
 [project.urls]
-Homepage = "https://github.com/playcap/playcap"
-Repository = "https://github.com/playcap/playcap"
+Homepage = "https://github.com/tatun55/shayde"
+Repository = "https://github.com/tatun55/shayde"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/playcap"]
+packages = ["src/shayde"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/playcap", "tests"]
+include = ["src/shayde", "tests"]
 
 [tool.ruff]
 line-length = 100

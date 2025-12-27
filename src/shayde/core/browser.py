@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, AsyncContextManager
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 
 if TYPE_CHECKING:
-    from playcap.config.schema import PlayCapConfig, ViewportConfig
+    from shayde.config.schema import ShaydeConfig, ViewportConfig
 
 logger = logging.getLogger(__name__)
 

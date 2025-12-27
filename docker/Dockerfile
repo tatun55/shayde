@@ -1,4 +1,4 @@
-# PlayCap Playwright with Japanese Fonts
+# Shayde Playwright with Japanese Fonts
 FROM mcr.microsoft.com/playwright:v1.48.0-noble
 
 # Install font tools and Japanese fonts

@@ -11,8 +11,8 @@ from rich.syntax import Syntax
 from rich.table import Table
 import yaml
 
-from playcap.config.loader import load_config, CONFIG_FILENAMES
-from playcap.config.schema import PlayCapConfig
+from shayde.config.loader import load_config, CONFIG_FILENAMES
+from shayde.config.schema import ShaydeConfig
 
 console = Console()
 app = typer.Typer(no_args_is_help=True)
@@ -27,10 +27,10 @@ def config_init(
         False, "--force", "-f", help="Overwrite existing config"
     ),
 ):
-    """Create a new .playcap.yaml configuration file."""
+    """Create a new .shayde.yaml configuration file."""
     # Default output path
     if output is None:
-        output = Path.cwd() / ".playcap.yaml"
+        output = Path.cwd() / ".shayde.yaml"
 
     # Check if file exists
     if output.exists() and not force:
@@ -38,7 +38,7 @@ def config_init(
         raise typer.Exit(1)
 
     # Generate default config
-    config = PlayCapConfig.get_default()
+    config = ShaydeConfig.get_default()
 
     # Convert to YAML with comments
     yaml_content = _generate_config_yaml(config)
@@ -48,10 +48,10 @@ def config_init(
     console.print(f"[green]✓[/green] Created: {output}")
 
 
-def _generate_config_yaml(config: PlayCapConfig) -> str:
+def _generate_config_yaml(config: ShaydeConfig) -> str:
     """Generate YAML config with helpful comments."""
-    return f"""# PlayCap Configuration
-# https://github.com/playcap/playcap
+    return f"""# Shayde Configuration
+# https://github.com/tatun55/shayde
 
 version: 1
 
@@ -131,7 +131,7 @@ def config_show(
         console.print(syntax)
 
     elif format == "table":
-        table = Table(title="PlayCap Configuration")
+        table = Table(title="Shayde Configuration")
         table.add_column("Setting", style="cyan")
         table.add_column("Value", style="green")
 

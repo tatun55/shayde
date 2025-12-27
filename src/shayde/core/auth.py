@@ -1,4 +1,4 @@
-"""Authentication support for PlayCap."""
+"""Authentication support for Shayde."""
 
 from __future__ import annotations
 

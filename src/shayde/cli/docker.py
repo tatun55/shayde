@@ -6,8 +6,8 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from playcap.config.loader import load_config
-from playcap.docker.manager import DockerManager
+from shayde.config.loader import load_config
+from shayde.docker.manager import DockerManager
 
 console = Console()
 app = typer.Typer(no_args_is_help=True)
@@ -74,7 +74,7 @@ def docker_status():
 def docker_build(
     force: bool = typer.Option(False, "--force", "-f", help="Force rebuild even if image exists"),
 ):
-    """Build the PlayCap Docker image with fonts."""
+    """Build the Shayde Docker image with fonts."""
     config = load_config()
     manager = DockerManager(config)
 

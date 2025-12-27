@@ -50,8 +50,8 @@ pip-delete-this-directory.txt
 .env
 .env.local
 
-# PlayCap specific
-.playcap.yaml
+# Shayde specific
+.shayde.yaml
 storage/
 screenshots/
 baselines/

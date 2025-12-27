@@ -1,4 +1,4 @@
-"""Main CLI entry point for PlayCap."""
+"""Main CLI entry point for Shayde."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ import typer
 from rich.console import Console
 from rich.logging import RichHandler
 
-from playcap import __version__
-from playcap.cli import capture, config, docker
+from shayde import __version__
+from shayde.cli import capture, config, docker
 
 # Set up logging
 logging.basicConfig(
@@ -23,8 +23,8 @@ logging.basicConfig(
 console = Console()
 
 app = typer.Typer(
-    name="playcap",
-    help="Docker Playwright screenshot capture and visual regression testing CLI",
+    name="shayde",
+    help="Docker Playwright E2E testing and screenshot capture CLI",
     add_completion=True,
     no_args_is_help=True,
 )
@@ -38,7 +38,7 @@ app.add_typer(docker.app, name="docker", help="Docker container management")
 def version_callback(value: bool):
     """Show version and exit."""
     if value:
-        console.print(f"PlayCap version {__version__}")
+        console.print(f"Shayde version {__version__}")
         raise typer.Exit()
 
 
@@ -68,7 +68,7 @@ def main(
         help="Show version and exit",
     ),
 ):
-    """PlayCap - Docker Playwright screenshot capture and visual regression CLI."""
+    """Shayde - Docker Playwright E2E testing and screenshot capture CLI."""
     ctx.ensure_object(dict)
     ctx.obj["config_file"] = config_file
     ctx.obj["verbose"] = verbose

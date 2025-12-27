@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from playwright.async_api import Route
-    from playcap.config.schema import PlayCapConfig
+    from shayde.config.schema import ShaydeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class RouteInterceptor:
     to host.docker.internal where the proxy is accessible.
     """
 
-    def __init__(self, config: PlayCapConfig):
+    def __init__(self, config: ShaydeConfig):
         self.config = config
         self.proxy_port = config.proxy.port
 
@@ -59,7 +59,7 @@ class RouteInterceptor:
         await route.continue_()
 
 
-def create_route_handler(config: PlayCapConfig):
+def create_route_handler(config: ShaydeConfig):
     """Create a route handler function for Playwright."""
     interceptor = RouteInterceptor(config)
     return interceptor.handle_route

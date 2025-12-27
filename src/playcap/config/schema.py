@@ -1,0 +1,112 @@
+"""Configuration schema for PlayCap using Pydantic."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field
+
+
+# Platform types for font simulation
+PlatformType = Literal["neutral", "mac", "windows"]
+
+
+class ViewportConfig(BaseModel):
+    """Viewport configuration."""
+
+    width: int = 1920
+    height: int = 1080
+    device_scale_factor: float = 1.0
+
+
+class FontConfig(BaseModel):
+    """Font configuration for platform simulation."""
+
+    platform: PlatformType = "neutral"
+    custom_fonts_dir: Optional[str] = None  # Mount additional fonts
+    css_override: Optional[str] = None  # Custom CSS for font-family
+
+
+class AppConfig(BaseModel):
+    """Application URL configuration."""
+
+    base_url: Optional[str] = None
+    env_file: str = ".env"
+    env_var: str = "APP_URL"
+
+
+class ProxyConfig(BaseModel):
+    """Dev server proxy configuration."""
+
+    enabled: bool = True
+    port: int = 9999
+    vite_port: Optional[int] = None  # Auto-detect if None
+    websocket: bool = True
+
+
+class DockerConfig(BaseModel):
+    """Docker container configuration."""
+
+    playwright_version: str = "1.48.0"
+    container_name: str = "playcap-playwright"
+    ws_port: int = 3000
+    auto_start: bool = True
+    auto_stop: bool = False
+    use_custom_image: bool = False  # Set True after running: playcap docker build
+    image_name: str = "playcap-playwright"  # Custom image name
+
+
+class OutputConfig(BaseModel):
+    """Screenshot output configuration."""
+
+    directory: str = "storage/screenshots"
+    filename_pattern: str = "{name}_{date}_{time}.png"
+    date_format: str = "%Y-%m-%d"
+    time_format: str = "%H%M%S"
+
+
+class CaptureConfig(BaseModel):
+    """Default capture settings."""
+
+    default_viewport: str = "desktop"
+    wait_until: Literal["load", "domcontentloaded", "networkidle"] = "networkidle"
+    wait_after: int = 0
+    full_page: bool = False
+    quality: Optional[int] = None
+
+
+class RegressionConfig(BaseModel):
+    """Visual regression settings."""
+
+    baseline_dir: str = "storage/baselines"
+    diff_dir: str = "storage/diffs"
+    threshold: float = 0.1
+    max_diff_pixels: Optional[int] = None
+    ignore_antialiasing: bool = True
+    update_snapshots: Literal["none", "missing", "all"] = "none"
+
+
+class PlayCapConfig(BaseModel):
+    """Root configuration model for PlayCap."""
+
+    version: int = 1
+    app: AppConfig = Field(default_factory=AppConfig)
+    proxy: ProxyConfig = Field(default_factory=ProxyConfig)
+    docker: DockerConfig = Field(default_factory=DockerConfig)
+    output: OutputConfig = Field(default_factory=OutputConfig)
+    fonts: FontConfig = Field(default_factory=FontConfig)
+    viewports: Dict[str, ViewportConfig] = Field(
+        default_factory=lambda: {
+            "mobile": ViewportConfig(width=375, height=812, device_scale_factor=2),
+            "tablet": ViewportConfig(width=768, height=1024),
+            "desktop": ViewportConfig(width=1920, height=1080),
+        }
+    )
+    capture: CaptureConfig = Field(default_factory=CaptureConfig)
+    regression: RegressionConfig = Field(default_factory=RegressionConfig)
+
+    @classmethod
+    def get_default(cls) -> "PlayCapConfig":
+        """Return default configuration."""
+        return cls()

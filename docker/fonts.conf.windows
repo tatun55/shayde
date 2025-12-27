@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- Windows-style font configuration for PlayCap -->
+<fontconfig>
+  <!-- Japanese sans-serif: BIZ UDGothic (Windows-style) -->
+  <match target="pattern">
+    <test name="lang" compare="contains">
+      <string>ja</string>
+    </test>
+    <test name="family">
+      <string>sans-serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>BIZ UDGothic</string>
+    </edit>
+  </match>
+
+  <!-- System UI font -->
+  <match target="pattern">
+    <test name="family">
+      <string>system-ui</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>BIZ UDGothic</string>
+    </edit>
+  </match>
+
+  <!-- Meiryo aliases -->
+  <alias>
+    <family>Meiryo</family>
+    <prefer><family>BIZ UDGothic</family></prefer>
+  </alias>
+  <alias>
+    <family>メイリオ</family>
+    <prefer><family>BIZ UDGothic</family></prefer>
+  </alias>
+  <alias>
+    <family>Yu Gothic</family>
+    <prefer><family>BIZ UDGothic</family></prefer>
+  </alias>
+  <alias>
+    <family>游ゴシック</family>
+    <prefer><family>BIZ UDGothic</family></prefer>
+  </alias>
+  <alias>
+    <family>MS Gothic</family>
+    <prefer><family>BIZ UDGothic</family></prefer>
+  </alias>
+
+  <!-- Mincho/Serif aliases -->
+  <alias>
+    <family>Yu Mincho</family>
+    <prefer><family>BIZ UDMincho</family></prefer>
+  </alias>
+  <alias>
+    <family>游明朝</family>
+    <prefer><family>BIZ UDMincho</family></prefer>
+  </alias>
+  <alias>
+    <family>MS Mincho</family>
+    <prefer><family>BIZ UDMincho</family></prefer>
+  </alias>
+  <alias>
+    <family>serif</family>
+    <prefer><family>BIZ UDMincho</family></prefer>
+  </alias>
+
+  <!-- Default Japanese font -->
+  <match target="pattern">
+    <test name="lang" compare="contains">
+      <string>ja</string>
+    </test>
+    <edit name="family" mode="append" binding="weak">
+      <string>BIZ UDGothic</string>
+    </edit>
+  </match>
+
+  <!-- Windows-like rendering: full hinting, grayscale AA -->
+  <match target="font">
+    <edit name="antialias" mode="assign"><bool>true</bool></edit>
+    <edit name="hinting" mode="assign"><bool>true</bool></edit>
+    <edit name="hintstyle" mode="assign"><const>hintfull</const></edit>
+    <edit name="rgba" mode="assign"><const>rgb</const></edit>
+    <edit name="lcdfilter" mode="assign"><const>lcddefault</const></edit>
+  </match>
+</fontconfig>

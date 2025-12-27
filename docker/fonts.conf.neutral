@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- Neutral font configuration for PlayCap (default) -->
+<fontconfig>
+  <!-- Japanese: Noto Sans CJK JP (neutral, cross-platform) -->
+  <match target="pattern">
+    <test name="lang" compare="contains">
+      <string>ja</string>
+    </test>
+    <test name="family">
+      <string>sans-serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Sans CJK JP</string>
+    </edit>
+  </match>
+
+  <!-- System UI font -->
+  <match target="pattern">
+    <test name="family">
+      <string>system-ui</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Sans CJK JP</string>
+    </edit>
+  </match>
+
+  <!-- Default Japanese font -->
+  <match target="pattern">
+    <test name="lang" compare="contains">
+      <string>ja</string>
+    </test>
+    <edit name="family" mode="append" binding="weak">
+      <string>Noto Sans CJK JP</string>
+    </edit>
+  </match>
+
+  <!-- Standard rendering -->
+  <match target="font">
+    <edit name="antialias" mode="assign"><bool>true</bool></edit>
+    <edit name="hinting" mode="assign"><bool>true</bool></edit>
+    <edit name="hintstyle" mode="assign"><const>hintslight</const></edit>
+    <edit name="rgba" mode="assign"><const>rgb</const></edit>
+    <edit name="lcdfilter" mode="assign"><const>lcddefault</const></edit>
+  </match>
+</fontconfig>

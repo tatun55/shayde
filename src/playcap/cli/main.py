@@ -1,0 +1,81 @@
+"""Main CLI entry point for PlayCap."""
+
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Optional
+
+import typer
+from rich.console import Console
+from rich.logging import RichHandler
+
+from playcap import __version__
+from playcap.cli import capture, config, docker
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[RichHandler(rich_tracebacks=True, show_path=False)],
+)
+
+console = Console()
+
+app = typer.Typer(
+    name="playcap",
+    help="Docker Playwright screenshot capture and visual regression testing CLI",
+    add_completion=True,
+    no_args_is_help=True,
+)
+
+# Register subcommands
+app.add_typer(capture.app, name="capture", help="Screenshot capture commands")
+app.add_typer(config.app, name="config", help="Configuration management")
+app.add_typer(docker.app, name="docker", help="Docker container management")
+
+
+def version_callback(value: bool):
+    """Show version and exit."""
+    if value:
+        console.print(f"PlayCap version {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    ctx: typer.Context,
+    config_file: Optional[Path] = typer.Option(
+        None,
+        "--config",
+        "-c",
+        help="Path to config file",
+        exists=True,
+        dir_okay=False,
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+    version: bool = typer.Option(
+        False,
+        "--version",
+        "-V",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version and exit",
+    ),
+):
+    """PlayCap - Docker Playwright screenshot capture and visual regression CLI."""
+    ctx.ensure_object(dict)
+    ctx.obj["config_file"] = config_file
+    ctx.obj["verbose"] = verbose
+
+    if verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+
+
+if __name__ == "__main__":
+    app()

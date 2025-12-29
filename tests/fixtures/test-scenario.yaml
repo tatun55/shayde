@@ -1,0 +1,107 @@
+version: 1
+
+meta:
+  id: "test-auth"
+  title: "認証テストシナリオ"
+  priority: high
+  estimated_time: 5
+  depends_on: []
+
+prerequisites:
+  - "テストユーザーが存在"
+
+coverage:
+  - { id: 1, name: "ログイン機能", status: complete }
+  - { id: 2, name: "ログアウト機能", status: partial }
+
+accounts:
+  admin:
+    email: admin@test.com
+    password: password
+    role: 管理者
+  user:
+    email: user@test.com
+    password: password
+    role: 一般ユーザー
+
+steps:
+  - part: 1
+    title: "ログイン失敗"
+    account: null
+    items:
+      - id: "1-1"
+        desc: "ログインページに遷移"
+        action:
+          goto: /login
+        expect:
+          url: /login
+        screenshot: true
+
+      - id: "1-2"
+        desc: "メールアドレス入力"
+        action:
+          fill:
+            selector: "[name=email]"
+            value: "user@test.com"
+
+      - id: "1-3"
+        desc: "誤ったパスワード入力"
+        action:
+          fill:
+            selector: "[name=password]"
+            value: "wrongpassword"
+
+      - id: "1-4"
+        desc: "ログインボタンクリック"
+        action:
+          click: "button[type=submit]"
+        expect:
+          visible: ".alert-error"
+          text_contains: "認証エラー"
+        screenshot: login_failed
+
+  - part: 2
+    title: "ログイン成功"
+    account: null
+    items:
+      - id: "2-1"
+        desc: "正しいパスワード入力"
+        action:
+          - clear: "[name=password]"
+          - fill: { selector: "[name=password]", value: "password" }
+
+      - id: "2-2"
+        desc: "ログインボタンクリック"
+        action:
+          click: "button[type=submit]"
+          wait: /dashboard
+        expect:
+          url_contains: /dashboard
+        screenshot: login_success
+
+  - part: 3
+    title: "ログアウト"
+    account: user
+    items:
+      - id: "3-1"
+        desc: "ユーザーメニューをクリック"
+        action:
+          click: "[data-testid=user-menu]"
+        expect:
+          visible: ".dropdown-content"
+
+      - id: "3-2"
+        desc: "ログアウトをクリック"
+        action:
+          click: "text=ログアウト"
+          wait: /login
+        expect:
+          url: /login
+        screenshot: logout_complete
+
+pass_criteria:
+  - "全ステップがエラーなく完了すること"
+  - "認証失敗時にエラーメッセージが表示されること"
+
+notes:
+  - "テスト用シナリオ"

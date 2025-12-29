@@ -1,0 +1,144 @@
+# Shayde Scenario Template
+# このファイルをコピーしてシナリオを作成
+
+version: 1
+
+# === メタ情報 ===
+meta:
+  id: "01-example"                    # シナリオID (ファイル名と一致推奨)
+  title: "サンプルシナリオ"             # タイトル
+  priority: high                      # high | medium | low
+  estimated_time: 10                  # 所要時間（分）
+  depends_on: []                      # 依存シナリオID
+
+# === 前提条件 ===
+prerequisites:
+  - "テストユーザーが存在"
+  - "初期データがセットアップ済み"
+
+# === カバー機能 ===
+coverage:
+  - { id: 1, name: "機能名1", status: complete }   # complete | partial
+  - { id: 2, name: "機能名2", status: partial }
+
+# === アカウント定義 ===
+accounts:
+  admin:
+    email: admin@test.com
+    password: password
+    role: 管理者
+  user:
+    email: user@test.com
+    password: password
+    role: 一般ユーザー
+
+# === テストステップ ===
+steps:
+  # --- Part 1 ---
+  - part: 1
+    title: "Part タイトル"
+    account: null                     # null = 未ログイン, "user" = userアカウント
+    items:
+      # --- Step 1-1: ナビゲーション ---
+      - id: "1-1"
+        desc: "ページに遷移"
+        action:
+          goto: /login
+        expect:
+          url: /login
+        screenshot: true              # true または 名前を指定
+
+      # --- Step 1-2: 入力 ---
+      - id: "1-2"
+        desc: "メールアドレス入力"
+        action:
+          fill:
+            selector: "[name=email]"
+            value: "user@test.com"
+        expect:
+          value:
+            selector: "[name=email]"
+            value: "user@test.com"
+
+      # --- Step 1-3: クリック ---
+      - id: "1-3"
+        desc: "ログインボタンクリック"
+        action:
+          click: "button[type=submit]"
+          wait: /dashboard            # クリック後の待機
+        expect:
+          url_contains: /dashboard
+        screenshot: login_success
+
+  # --- Part 2 ---
+  - part: 2
+    title: "認証後の操作"
+    account: user                     # userアカウントでログイン状態
+    items:
+      - id: "2-1"
+        desc: "ダッシュボード表示確認"
+        action: null                  # 検証のみ
+        expect:
+          visible: ".dashboard"
+          text_contains: "ようこそ"
+        screenshot: true
+
+      # --- 複合アクション ---
+      - id: "2-2"
+        desc: "フォーム入力から送信まで"
+        action:
+          - fill: { selector: "[name=title]", value: "テストタイトル" }
+          - fill: { selector: "[name=content]", value: "テスト内容" }
+          - click: "button[type=submit]"
+          - wait: ".success-message"
+        expect:
+          - visible: ".success-message"
+          - text_contains: "保存しました"
+        screenshot: form_submitted
+
+      # --- ファイルアップロード ---
+      - id: "2-3"
+        desc: "ファイルアップロード"
+        action:
+          upload:
+            selector: "[type=file]"
+            file: "test-files/sample.pdf"
+        expect:
+          visible: ".file-preview"
+
+      # --- セレクト選択 ---
+      - id: "2-4"
+        desc: "カテゴリ選択"
+        action:
+          select:
+            selector: "[name=category]"
+            value: "option_value"     # value属性 または 表示テキスト
+
+      # --- 認証ショートカット ---
+      - id: "2-5"
+        desc: "管理者に切り替え"
+        action:
+          login: admin                # accounts.adminでログイン
+        expect:
+          url_contains: /admin
+
+      # --- ログアウト ---
+      - id: "2-6"
+        desc: "ログアウト"
+        action:
+          logout: true
+        expect:
+          url: /login
+
+# === 合否判定基準 ===
+pass_criteria:
+  - "全ステップがエラーなく完了すること"
+  - "期待結果が全て満たされること"
+
+# === 備考 ===
+notes:
+  - "補足情報をここに記載"
+
+# === テストファイル ===
+test_files:
+  - { name: "sample.pdf", path: "test-files/sample.pdf", description: "テスト用PDF" }

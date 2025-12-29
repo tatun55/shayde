@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 
 from shayde import __version__
-from shayde.cli import capture, config, docker, test
+from shayde.cli import capture, config, docker, scenario, test
 
 # Set up logging
 logging.basicConfig(
@@ -34,6 +34,7 @@ app.add_typer(capture.app, name="capture", help="Screenshot capture commands")
 app.add_typer(config.app, name="config", help="Configuration management")
 app.add_typer(docker.app, name="docker", help="Docker container management")
 app.add_typer(test.app, name="test", help="Playwright E2E test commands")
+app.add_typer(scenario.app, name="scenario", help="YAML scenario execution commands")
 
 
 def version_callback(value: bool):

@@ -83,13 +83,15 @@ class ScenarioSession:
             await self._proxy_manager.start()
             logger.info(f"Proxy started on port {config.proxy.port}")
 
-        # Build context options
-        context_options = {}
+        # Build context options with fixed viewport
+        context_options = {
+            "viewport": {"width": 1280, "height": 720},
+        }
 
         # Video recording (use temp dir in container, save via save_as later)
         if self.record_video:
             context_options["record_video_dir"] = "/tmp/shayde-videos"
-            context_options["record_video_size"] = {"width": 1920, "height": 1080}
+            context_options["record_video_size"] = {"width": 1280, "height": 720}
             logger.info("Video recording enabled")
 
         self.context = await self.browser.new_context(**context_options)

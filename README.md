@@ -246,8 +246,12 @@ test:
 ## 要件
 
 - Python 3.8+
-- Docker Desktop
+- Docker Desktop（macOS/Windows）または Docker Engine（Linux）
 - Laravel Valet（推奨、他の開発サーバーでも動作可能）
+
+### サーバー環境
+
+EC2 などのサーバー環境での常時起動設定は [Amazon Linux 2023 セットアップガイド](docs/setup-amazon-linux-2023.md) を参照。
 
 ## トラブルシューティング
 

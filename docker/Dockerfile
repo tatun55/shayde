@@ -1,5 +1,10 @@
 # Shayde Playwright with Japanese Fonts
-FROM mcr.microsoft.com/playwright:v1.48.0-noble
+#
+# IMPORTANT: Keep this version in sync with:
+#   1. pip show playwright | grep Version
+#   2. .shayde.yaml docker.playwright_version
+#
+FROM mcr.microsoft.com/playwright:v1.57.0-noble
 
 # Install font tools and Japanese fonts
 RUN apt-get update && apt-get install -y --no-install-recommends \

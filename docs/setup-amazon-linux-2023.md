@@ -178,6 +178,55 @@ sudo systemctl enable crond --now
 (crontab -l 2>/dev/null; echo "*/5 * * * * /var/www/shayde/healthcheck.sh >> /var/log/shayde-health.log 2>&1") | crontab -
 ```
 
+## 8. サーバーモード（オプション・高速化）
+
+Playwright 接続を維持して、キャプチャを約20%高速化。
+
+```bash
+# サーバー起動
+shayde server start
+
+# 状態確認
+shayde server status
+# 出力例:
+# Server is running
+#   PID: 12345
+#   URL: http://127.0.0.1:9876
+#   Browser connected: True
+
+# キャプチャ（自動でサーバー経由になる）
+shayde capture page https://example.com
+
+# サーバー停止
+shayde server stop
+```
+
+### Systemd でサーバーも常時起動（推奨）
+
+```bash
+sudo tee /etc/systemd/system/shayde-server.service << 'EOF'
+[Unit]
+Description=Shayde API Server
+After=shayde.service
+Requires=shayde.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/shayde
+ExecStart=/var/www/shayde/venv/bin/shayde server start -f
+Restart=always
+RestartSec=5
+Environment="PATH=/var/www/shayde/venv/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable shayde-server
+sudo systemctl start shayde-server
+```
+
 ## トラブルシューティング
 
 ### バージョン不一致エラー

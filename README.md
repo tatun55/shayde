@@ -9,6 +9,7 @@ Host Proxy 方式により、各プロジェクトの Vite 設定変更なしで
 - **日本語フォント対応**: Mac/Windows スタイルのフォント切り替え
 - **認証サポート**: ログイン後のページもキャプチャ可能
 - **レスポンシブ対応**: mobile/tablet/desktop の一括キャプチャ
+- **サーバーモード**: Playwright 接続を維持して高速化（約20%改善）
 
 ## インストール
 
@@ -124,6 +125,19 @@ shayde scenario session info <session_id>          # セッション詳細
 # シナリオ解析
 shayde scenario parse scenario.yaml                # 構造表示
 shayde scenario list scenario.yaml                 # ステップ一覧
+```
+
+### サーバー管理（高速化モード）
+
+```bash
+shayde server start     # サーバー起動（バックグラウンド）
+shayde server stop      # サーバー停止
+shayde server status    # 状態確認
+shayde server restart   # 再起動
+
+# サーバー起動中は capture コマンドが自動で高速モードになる
+shayde server start
+shayde capture page /login   # サーバー経由で実行（約20%高速）
 ```
 
 ### 設定管理

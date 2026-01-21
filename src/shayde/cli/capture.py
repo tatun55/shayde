@@ -18,6 +18,50 @@ app = typer.Typer(no_args_is_help=True)
 PlatformOption = Literal["neutral", "mac", "windows"]
 
 
+async def _capture_page_via_server(
+    url: str,
+    output: Optional[Path],
+    width: Optional[int],
+    height: Optional[int],
+    full_page: bool,
+):
+    """Capture via Shayde server (faster, uses persistent connection)."""
+    from shayde.server.client import ShaydeClient
+    from shayde.config.loader import load_config
+    import os
+    from datetime import datetime
+
+    config = load_config()
+
+    # Determine output path
+    if output:
+        output_path = str(output)
+    else:
+        output_dir = Path(config.output.directory)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = str(output_dir / f"capture_{timestamp}.png")
+
+    # Viewport
+    viewport = None
+    if width or height:
+        viewport = {"width": width or 1920, "height": height or 1080}
+
+    client = ShaydeClient()
+    with console.status("[bold green]Capturing via server..."):
+        result = await client.capture(
+            url=url,
+            output=output_path,
+            viewport=viewport,
+            full_page=full_page,
+        )
+
+    if result.get("status") == "ok":
+        console.print(f"[green]✓[/green] Saved: {result.get('output')}")
+    else:
+        console.print(f"[red]✗[/red] Error: {result.get('error')}")
+
+
 @app.command("page")
 def capture_page(
     url: str = typer.Argument(..., help="URL or path to capture"),
@@ -72,6 +116,20 @@ async def _capture_page(
     wait_for: Optional[str],
 ):
     """Async implementation of capture_page."""
+    from shayde.server.client import ShaydeClient
+
+    # Check if server is running - use HTTP API for faster execution
+    if ShaydeClient.server_available():
+        await _capture_page_via_server(
+            url=url,
+            output=output,
+            width=width,
+            height=height,
+            full_page=full_page,
+        )
+        return
+
+    # Fallback to direct Playwright connection
     from shayde.config.schema import ViewportConfig
     from shayde.core.capture import CaptureSession
 

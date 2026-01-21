@@ -157,3 +157,124 @@ class ScenarioResult:
                 "duration_ms": self.duration_ms,
             },
         }
+
+
+# --- Step-by-step execution models ---
+
+
+@dataclass
+class StepExecutionResult:
+    """Result of a single step execution in step-by-step mode."""
+
+    session_id: str
+    step_id: str
+    step_desc: str
+    part_num: int
+    part_title: str
+    result: StepResult
+    is_completed: bool
+    is_part_change: bool
+    is_account_change: bool
+    next_part: Optional[int]
+    next_step: Optional[str]
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "session_id": self.session_id,
+            "step": {
+                "id": self.step_id,
+                "desc": self.step_desc,
+                "part": self.part_num,
+                "part_title": self.part_title,
+            },
+            "result": {
+                "status": self.result.status.value,
+                "duration_ms": self.result.duration_ms,
+                "screenshot": str(self.result.screenshot) if self.result.screenshot else None,
+                "assertions": [
+                    {
+                        "type": a.type,
+                        "expected": a.expected,
+                        "passed": a.passed,
+                    }
+                    for a in self.result.assertions
+                ],
+                "error": self.result.error,
+            },
+            "next": {
+                "part": self.next_part,
+                "step": self.next_step,
+                "is_part_change": self.is_part_change,
+                "is_account_change": self.is_account_change,
+                "is_completed": self.is_completed,
+            },
+        }
+
+
+@dataclass
+class SessionEndResult:
+    """Result of ending a step-by-step session."""
+
+    session_id: str
+    status: str
+    total_steps: int
+    passed: int
+    failed: int
+    skipped: int
+    duration_ms: int
+    results_path: Optional[Path]
+    video_path: Optional[Path]
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "session_id": self.session_id,
+            "result": {
+                "status": self.status,
+                "total_steps": self.total_steps,
+                "passed": self.passed,
+                "failed": self.failed,
+                "skipped": self.skipped,
+                "duration_ms": self.duration_ms,
+            },
+            "output": {
+                "results_json": str(self.results_path) if self.results_path else None,
+                "video": str(self.video_path) if self.video_path else None,
+            },
+        }
+
+
+@dataclass
+class SessionInfo:
+    """Information about an active step-by-step session."""
+
+    session_id: str
+    scenario_id: str
+    scenario_title: str
+    total_parts: int
+    total_steps: int
+    current_part: int
+    current_step_index: int
+    current_account: Optional[str]
+    status: str
+    created_at: datetime
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "session_id": self.session_id,
+            "scenario": {
+                "id": self.scenario_id,
+                "title": self.scenario_title,
+                "total_parts": self.total_parts,
+                "total_steps": self.total_steps,
+            },
+            "current": {
+                "part": self.current_part,
+                "step": self.current_step_index,
+                "account": self.current_account,
+            },
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+        }

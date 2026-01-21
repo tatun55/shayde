@@ -164,6 +164,8 @@ class ScenarioSession:
             logger.info("Video recording enabled")
 
         self.context = await self.browser.new_context(**context_options)
+        # Set default timeout to 10 seconds (Playwright default is 30s)
+        self.context.set_default_timeout(10000)
         self.page = await self.context.new_page()
 
         # Set up route interception for Docker → host redirection
@@ -260,7 +262,21 @@ class ScenarioSession:
             # Submit
             await self.page.click("button[type=submit], input[type=submit]")
 
-            # Wait for navigation (either dashboard or error)
+            # Wait for redirect to complete (URL changes from /login)
+            # First wait for any navigation to start
+            await self.page.wait_for_load_state("domcontentloaded")
+
+            # Wait for URL to change from /login (with timeout)
+            try:
+                await self.page.wait_for_function(
+                    "() => !window.location.href.includes('/login')",
+                    timeout=10000
+                )
+            except Exception:
+                # URL didn't change - login might have failed
+                pass
+
+            # Wait for page to fully settle
             await self.page.wait_for_load_state("networkidle")
 
             # Check if login was successful (not on login page anymore)
@@ -316,18 +332,16 @@ class ScenarioSession:
         Returns:
             Path to screenshot file
         """
-        # Part directory: part-01_未認証アクセス制御
-        part_dir_name = f"part-{part.part:02d}_{sanitize_filename(part.title)}"
-        part_dir = self.output_dir / part_dir_name
-        part_dir.mkdir(parents=True, exist_ok=True)
+        # Flat structure: all screenshots in output_dir with part prefix in filename
+        # Filename: part-01_step-1-1_ログインページに遷移.png
+        part_prefix = f"part-{part.part:02d}"
 
-        # Screenshot filename: step-1-1_ログインページに遷移.png
         if custom_name:
-            filename = f"step-{step_id}_{sanitize_filename(custom_name)}.png"
+            filename = f"{part_prefix}_step-{step_id}_{sanitize_filename(custom_name)}.png"
         else:
-            filename = f"step-{step_id}_{sanitize_filename(step_desc)}.png"
+            filename = f"{part_prefix}_step-{step_id}_{sanitize_filename(step_desc)}.png"
 
-        return part_dir / filename
+        return self.output_dir / filename
 
     def start_part(self, part: Part) -> None:
         """Start tracking a new part.
@@ -383,13 +397,77 @@ class ScenarioSession:
     def save_results(self) -> Path:
         """Save results to JSON file.
 
+        For partial runs, merges with existing results to preserve
+        results from other parts that were not executed.
+
         Returns:
             Path to results file
         """
         results_path = self.output_dir / "results.json"
+        current_result = self.result.to_dict()
+
+        # Try to load existing results for merging
+        if results_path.exists():
+            try:
+                with open(results_path, "r", encoding="utf-8") as f:
+                    existing = json.load(f)
+
+                # Get part numbers from current run
+                current_parts = {p["part"] for p in current_result["parts"]}
+
+                # Merge: keep existing parts that were not in current run
+                merged_parts = []
+                for existing_part in existing.get("parts", []):
+                    if existing_part["part"] not in current_parts:
+                        merged_parts.append(existing_part)
+
+                # Add current run's parts
+                merged_parts.extend(current_result["parts"])
+
+                # Sort by part number
+                merged_parts.sort(key=lambda p: p["part"])
+
+                # Update the result with merged parts
+                current_result["parts"] = merged_parts
+
+                # Recalculate summary
+                total_steps = sum(len(p["steps"]) for p in merged_parts)
+                passed = sum(
+                    1 for p in merged_parts for s in p["steps"]
+                    if s["status"] == "passed"
+                )
+                failed = sum(
+                    1 for p in merged_parts for s in p["steps"]
+                    if s["status"] == "failed"
+                )
+                skipped = sum(
+                    1 for p in merged_parts for s in p["steps"]
+                    if s["status"] == "skipped"
+                )
+
+                current_result["summary"] = {
+                    "total_steps": total_steps,
+                    "passed": passed,
+                    "failed": failed,
+                    "skipped": skipped,
+                    "duration_ms": current_result["summary"]["duration_ms"],
+                }
+
+                # Update overall status based on merged results
+                if failed > 0:
+                    current_result["status"] = "failed"
+                elif passed > 0:
+                    current_result["status"] = "passed"
+                else:
+                    current_result["status"] = "skipped"
+
+                logger.info(f"Merged results with existing (kept {len(merged_parts) - len(self.result.parts)} existing parts)")
+
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.warning(f"Could not merge with existing results: {e}")
 
         with open(results_path, "w", encoding="utf-8") as f:
-            json.dump(self.result.to_dict(), f, ensure_ascii=False, indent=2)
+            json.dump(current_result, f, ensure_ascii=False, indent=2)
 
         logger.info(f"Results saved to {results_path}")
         return results_path
@@ -411,8 +489,6 @@ class ScenarioSession:
         Returns:
             Path to output directory
         """
-        import shutil
-
         # Build directory name: {id}_{title} or just {id}
         if title:
             safe_title = sanitize_filename(title)
@@ -422,10 +498,7 @@ class ScenarioSession:
 
         output_dir = base_dir / dir_name
 
-        # Remove existing directory (overwrite mode)
-        if output_dir.exists():
-            shutil.rmtree(output_dir)
-
+        # Create directory if not exists (files will be overwritten as needed)
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir
 

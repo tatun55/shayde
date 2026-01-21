@@ -18,24 +18,18 @@ RUN mkdir -p /usr/share/fonts/inter /usr/share/fonts/source-han-sans /usr/share/
 # Most popular open-source UI font, very close to Apple's San Francisco
 RUN curl -fsSL -o /tmp/inter.zip \
     "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" && \
-    unzip -j /tmp/inter.zip "Inter-4.0/InterVariable.ttf" -d /usr/share/fonts/inter/ && \
-    unzip -j /tmp/inter.zip "Inter-4.0/InterVariable-Italic.ttf" -d /usr/share/fonts/inter/ && \
+    unzip -j /tmp/inter.zip "InterVariable.ttf" -d /usr/share/fonts/inter/ && \
+    unzip -j /tmp/inter.zip "InterVariable-Italic.ttf" -d /usr/share/fonts/inter/ && \
     rm -f /tmp/inter.zip
 
 # Download Source Han Sans JP Variable Font (Adobe) - Mac-style Japanese font
 # Variable font supports weight range 250-900 (similar to Hiragino Sans)
 # This is the closest open-source equivalent to Mac's Hiragino
 RUN curl -fsSL -o /tmp/source-han-sans-vf.zip \
-    "https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansJP-VF.otf.zip" && \
-    unzip -o /tmp/source-han-sans-vf.zip -d /usr/share/fonts/source-han-sans/ && \
+    "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/02_SourceHanSans-VF.zip" && \
+    unzip -j /tmp/source-han-sans-vf.zip "*JP*.ttf" -d /usr/share/fonts/source-han-sans/ || \
+    unzip -j /tmp/source-han-sans-vf.zip "*.ttf" -d /usr/share/fonts/source-han-sans/ || true && \
     rm -f /tmp/source-han-sans-vf.zip
-
-# Also download static weights for fallback compatibility
-RUN curl -fsSL -o /tmp/source-han-sans.zip \
-    "https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansJP.zip" && \
-    unzip -j /tmp/source-han-sans.zip "OTF/Japanese/*.otf" -d /usr/share/fonts/source-han-sans/ || \
-    unzip -j /tmp/source-han-sans.zip "*.otf" -d /usr/share/fonts/source-han-sans/ || true && \
-    rm -f /tmp/source-han-sans.zip
 
 # Download BIZ UDGothic - Windows-style Japanese font (free from Google Fonts)
 RUN curl -fsSL -o /tmp/bizudgothic.zip \

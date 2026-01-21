@@ -104,6 +104,28 @@ shayde test run --skip-before         # before コマンドをスキップ
 shayde test list                      # テストファイル一覧
 ```
 
+### シナリオテスト
+
+```bash
+# 一括実行
+shayde scenario run scenario.yaml                  # 全ステップ実行
+shayde scenario run scenario.yaml --part 2         # Part 2 のみ
+shayde scenario run scenario.yaml -e               # エラー時停止
+
+# ステップバイステップ実行（対話的）
+shayde scenario session start scenario.yaml        # セッション開始
+shayde scenario session step <session_id>          # 次のステップ実行
+shayde scenario session step <session_id> --retry  # リトライ
+shayde scenario session step <session_id> --skip   # スキップ
+shayde scenario session end <session_id>           # セッション終了
+shayde scenario session list                       # アクティブセッション一覧
+shayde scenario session info <session_id>          # セッション詳細
+
+# シナリオ解析
+shayde scenario parse scenario.yaml                # 構造表示
+shayde scenario list scenario.yaml                 # ステップ一覧
+```
+
 ### 設定管理
 
 ```bash

@@ -363,14 +363,28 @@ class ActionExecutor:
                 error=str(e),
             )
 
-    async def wait(self, page: "Page", target: str) -> ActionResult:
-        """Wait for URL or selector.
+    async def wait(self, page: "Page", target) -> ActionResult:
+        """Wait for URL, selector, or duration.
 
         Args:
             page: Playwright page
-            target: URL pattern (starts with /) or CSS selector
+            target: URL pattern (starts with /), CSS selector, or duration in ms (int)
         """
+        import asyncio
+
         try:
+            # If target is a number, wait for that duration
+            if isinstance(target, (int, float)):
+                logger.debug(f"Waiting for {target}ms")
+                await asyncio.sleep(target / 1000)
+                return ActionResult(
+                    success=True,
+                    action_type="wait",
+                    message=f"Waited for {target}ms",
+                    data={"duration_ms": target},
+                )
+
+            # String target: URL or selector
             if target.startswith("/"):
                 logger.debug(f"Waiting for URL: {target}")
                 await page.wait_for_url(f"**{target}*", timeout=10000)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -166,6 +167,30 @@ class Scenario:
         }
 
 
+def expand_env_vars(data: Any) -> Any:
+    """Recursively expand ${VAR} patterns in data with environment variables.
+
+    Args:
+        data: Data structure (dict, list, or str)
+
+    Returns:
+        Data with environment variables expanded
+    """
+    if isinstance(data, str):
+        # Replace ${VAR} with os.environ.get('VAR', '')
+        pattern = re.compile(r'\$\{([^}]+)\}')
+        def replacer(match):
+            var_name = match.group(1)
+            return os.environ.get(var_name, '')
+        return pattern.sub(replacer, data)
+    elif isinstance(data, dict):
+        return {k: expand_env_vars(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [expand_env_vars(item) for item in data]
+    else:
+        return data
+
+
 class ScenarioParser:
     """YAML scenario parser."""
 
@@ -196,6 +221,9 @@ class ScenarioParser:
 
         if not data:
             raise ValueError(f"Empty scenario file: {path}")
+
+        # Expand environment variables in the data
+        data = expand_env_vars(data)
 
         return self._parse_scenario(data, path)
 

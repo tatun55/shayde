@@ -155,6 +155,7 @@ class ScenarioSession:
         # Build context options with fixed viewport
         context_options = {
             "viewport": {"width": 1280, "height": 720},
+            "ignore_https_errors": True,  # Allow self-signed or invalid certificates
         }
 
         # Video recording (use temp dir in container, save via save_as later)

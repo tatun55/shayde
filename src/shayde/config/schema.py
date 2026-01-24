@@ -106,6 +106,12 @@ class TestConfig(BaseModel):
     workers: int = 1  # Number of parallel workers
 
 
+class DialogConfig(BaseModel):
+    """Dialog (alert/confirm/prompt) handling configuration."""
+
+    auto_accept: bool = True  # Automatically accept all dialogs
+
+
 class ShaydeConfig(BaseModel):
     """Root configuration model for Shayde."""
 
@@ -125,6 +131,7 @@ class ShaydeConfig(BaseModel):
     capture: CaptureConfig = Field(default_factory=CaptureConfig)
     regression: RegressionConfig = Field(default_factory=RegressionConfig)
     test: TestConfig = Field(default_factory=TestConfig)
+    dialog: DialogConfig = Field(default_factory=DialogConfig)
 
     @classmethod
     def get_default(cls) -> "ShaydeConfig":

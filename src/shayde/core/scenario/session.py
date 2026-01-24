@@ -169,11 +169,12 @@ class ScenarioSession:
         self.context.set_default_timeout(10000)
         self.page = await self.context.new_page()
 
-        # Auto-accept all dialogs (alert, confirm, prompt)
-        async def handle_dialog(dialog):
-            logger.info(f"Dialog detected: {dialog.type} - {dialog.message}")
-            await dialog.accept()
-        self.page.on("dialog", handle_dialog)
+        # Auto-accept dialogs if configured (default: true)
+        if config.dialog.auto_accept:
+            async def handle_dialog(dialog):
+                logger.info(f"Dialog auto-accepted: {dialog.type} - {dialog.message}")
+                await dialog.accept()
+            self.page.on("dialog", handle_dialog)
 
         # Set up route interception for Docker → host redirection
         route_handler = create_route_handler(config)

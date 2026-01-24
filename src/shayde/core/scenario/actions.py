@@ -102,6 +102,12 @@ class ActionExecutor:
         if "wait" in action:
             return await self.wait(page, action["wait"])
 
+        if "accept_dialog" in action:
+            return await self.handle_dialog(page, accept=True)
+
+        if "dismiss_dialog" in action:
+            return await self.handle_dialog(page, accept=False)
+
         return ActionResult(
             success=False,
             action_type="unknown",
@@ -429,5 +435,57 @@ class ActionExecutor:
             return ActionResult(
                 success=False,
                 action_type="logout",
+                error=str(e),
+            )
+
+    async def handle_dialog(self, page: "Page", accept: bool = True) -> ActionResult:
+        """Set up a one-time dialog handler.
+
+        Args:
+            page: Playwright page
+            accept: True to accept, False to dismiss
+        """
+        import asyncio
+
+        action_type = "accept_dialog" if accept else "dismiss_dialog"
+        dialog_handled = asyncio.Event()
+        dialog_info = {"type": None, "message": None}
+
+        async def one_time_handler(dialog):
+            dialog_info["type"] = dialog.type
+            dialog_info["message"] = dialog.message
+            if accept:
+                await dialog.accept()
+            else:
+                await dialog.dismiss()
+            dialog_handled.set()
+
+        page.once("dialog", one_time_handler)
+
+        try:
+            # Wait for dialog with timeout
+            await asyncio.wait_for(dialog_handled.wait(), timeout=10.0)
+            logger.info(f"Dialog {action_type}: {dialog_info['type']} - {dialog_info['message']}")
+
+            return ActionResult(
+                success=True,
+                action_type=action_type,
+                message=f"Dialog {action_type}d: {dialog_info['message']}",
+                data=dialog_info,
+            )
+
+        except asyncio.TimeoutError:
+            logger.warning(f"No dialog appeared within timeout for {action_type}")
+            return ActionResult(
+                success=True,  # Not a failure, just no dialog
+                action_type=action_type,
+                message="No dialog appeared",
+            )
+
+        except Exception as e:
+            logger.error(f"Dialog handling failed: {e}")
+            return ActionResult(
+                success=False,
+                action_type=action_type,
                 error=str(e),
             )

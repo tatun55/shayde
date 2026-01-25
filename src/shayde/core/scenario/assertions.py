@@ -51,6 +51,9 @@ class AssertionExecutor:
         if "url_contains" in expect:
             results.append(await self.url_contains(page, expect["url_contains"]))
 
+        if "url_matches" in expect:
+            results.append(await self.url_matches(page, expect["url_matches"]))
+
         # Element assertions
         if "visible" in expect:
             results.append(await self.visible(page, expect["visible"]))
@@ -143,6 +146,37 @@ class AssertionExecutor:
             return AssertionResult(
                 type="url_contains",
                 expected=expected,
+                actual=str(e),
+                passed=False,
+                message=f"Error: {e}",
+            )
+
+    async def url_matches(self, page: "Page", pattern: str) -> AssertionResult:
+        """Assert URL matches regex pattern.
+
+        Args:
+            page: Playwright page
+            pattern: Regex pattern to match
+        """
+        import re
+
+        try:
+            current_url = page.url
+            passed = bool(re.search(pattern, current_url))
+
+            return AssertionResult(
+                type="url_matches",
+                expected=pattern,
+                actual=current_url,
+                passed=passed,
+                message=f"URL {'matches' if passed else 'does not match'} pattern '{pattern}'",
+            )
+
+        except Exception as e:
+            logger.error(f"URL matches assertion failed: {e}")
+            return AssertionResult(
+                type="url_matches",
+                expected=pattern,
                 actual=str(e),
                 passed=False,
                 message=f"Error: {e}",

@@ -158,14 +158,27 @@ class ScenarioRunner:
                     result.error = f"Assertions failed: {[a.message for a in failed]}"
                     logger.error(f"Assertions failed: {failed}")
 
-            # Take screenshot if requested
+            # Take screenshot if requested (best-effort: this is a record/debug
+            # aid, not a correctness check. If the action and assertions above
+            # already succeeded — e.g. a form was actually submitted — a
+            # screenshot timeout (commonly caused by the destination page's
+            # web fonts failing to load within the session's default timeout)
+            # must not flip an otherwise-successful step to FAILED, since that
+            # can trigger a retry of a scenario whose side effect already
+            # happened (e.g. duplicate form submission).
             if step.has_screenshot and result.status != StepStatus.FAILED:
                 screenshot_path = self.session.get_screenshot_path(
                     part, step.id, step.desc, step.screenshot_name
                 )
-                await page.screenshot(path=str(screenshot_path))
-                result.screenshot = screenshot_path
-                logger.info(f"Screenshot saved: {screenshot_path}")
+                try:
+                    await page.screenshot(path=str(screenshot_path))
+                    result.screenshot = screenshot_path
+                    logger.info(f"Screenshot saved: {screenshot_path}")
+                except Exception as e:
+                    logger.warning(
+                        f"Screenshot failed for step {step.id}, continuing "
+                        f"(action/assertions already succeeded): {e}"
+                    )
 
             # Mark as passed if no errors
             if result.status == StepStatus.RUNNING:
